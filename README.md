@@ -2,7 +2,7 @@
 
 ![love2D shield](https://img.shields.io/badge/L%C3%96VE-0.10.1-E76027.svg) ![howl shield](https://img.shields.io/badge/Howl-master-4E63B5.svg)
 
-It adds completion for the LÖVE API.
+It adds completion and inline documentation for LÖVE.
 
 #### Installation
 1. `cd ~/.howl/bundles`
