@@ -11,7 +11,7 @@ run_handler = () ->
     working_directory: proj.root.path
   })
 
-command.register(
+command.register({
   name: 'love-run'
   description: 'Run the LÖVE project'
   handler: run_handler
@@ -20,6 +20,7 @@ command.register(
 unload = () ->
   howl.mode.unregister 'love2D'
   command.unregister 'love-run'
+
 
 mode_reg =
   name: 'love2D'
