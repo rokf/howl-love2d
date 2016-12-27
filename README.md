@@ -10,7 +10,6 @@
 #### Installation
 1. `cd ~/.howl/bundles`
 2. `git clone https://github.com/rokf/love2D`
-3. `:buffer-mode love2D`
 
 #### API Source
-The API is generated from [love2d-community/love-api](https://github.com/love2d-community/love-api).
+The API is generated from [love2d-community/love-api](https://github.com/love2d-community/love-api) and appended to the Lua API.

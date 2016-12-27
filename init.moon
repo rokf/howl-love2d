@@ -18,23 +18,17 @@ command.register({
 })
 
 unload = () ->
-  howl.mode.unregister 'love2D'
   command.unregister 'love-run'
+  howl.mode.by_name('lua').api.love = nil
 
-
-mode_reg =
-  name: 'love2D'
-  shebangs: '/lua.*$'
-  extensions: 'lua'
-  parent: 'lua'
-  create: bundle_load('love_mode')
-
-howl.mode.register mode_reg
+-- append the LÖVE API to Lua
+love_api = bundle_load('love_api')
+howl.mode.by_name('lua').api.love = love_api.love
 
 return {
   info:
     author: 'Rok Fajfar'
-    description: 'love2D mode'
+    description: 'love2D bundle'
     license: 'MIT'
   :unload
 }
