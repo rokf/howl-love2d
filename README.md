@@ -1,4 +1,4 @@
-### love2D mode for Howl
+### LÖVE bundle for Howl
 
 ![love2D shield](https://img.shields.io/badge/L%C3%96VE-v0.10.2-B1E3FA.svg) ![howl shield](https://img.shields.io/badge/Howl-master-4E63B5.svg)
 
