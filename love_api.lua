@@ -1728,8 +1728,8 @@ return {
         signature = "[fun] (width: number, height: number, format: CanvasFormat, msaa: number) -> (canvas: Canvas)"
       },
       newFont = {
-        description = "[fun] (filename: string, size: number) -> (font: Font)\n\nCreates a new Font.",
-        signature = "[fun] (filename: string, size: number) -> (font: Font)"
+        description = "[fun] (filename: string) -> (font: Font)\n\nCreates a new Font from a TrueType Font or BMFont file.\nCreated fonts are not cached, in that calling this function with the same arguments will always create a new Font object.\n\nAll variants which accept a filename can also accept a Data object instead.",
+        signature = "[fun] (filename: string) -> (font: Font)"
       },
       newImage = {
         description = "[fun] (filename: string) -> (image: Image)\n\nCreates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.",
@@ -3410,12 +3410,12 @@ return {
           description = "[var]\n\nThe keypad forward-slash key on an American layout.",
           signature = "[var]"
         },
-        kp000 = {
-          description = "[var]\n\nThe keypad 000 key on an American layout.",
-          signature = "[var]"
-        },
         kp0 = {
           description = "[var]\n\nThe keypad '0' key on an American layout.",
+          signature = "[var]"
+        },
+        kp000 = {
+          description = "[var]\n\nThe keypad 000 key on an American layout.",
           signature = "[var]"
         },
         kp00 = {
@@ -3753,8 +3753,8 @@ return {
       signature = "[fun] (key: KeyConstant, scancode: Scancode, isrepeat: boolean) -> ()"
     },
     keyreleased = {
-      description = "[fun] (key: KeyConstant) -> ()\n\nCallback function triggered when a keyboard key is released.",
-      signature = "[fun] (key: KeyConstant) -> ()"
+      description = "[fun] (key: KeyConstant, scancode: Scancode) -> ()\n\nCallback function triggered when a keyboard key is released.",
+      signature = "[fun] (key: KeyConstant, scancode: Scancode) -> ()"
     },
     load = {
       description = "[fun] (arg: table) -> ()\n\nThis function is called exactly once at the beginning of the game.",
