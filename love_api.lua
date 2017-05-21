@@ -3414,12 +3414,12 @@ return {
           description = "[var]\n\nThe keypad '0' key on an American layout.",
           signature = "[var]"
         },
-        kp000 = {
-          description = "[var]\n\nThe keypad 000 key on an American layout.",
-          signature = "[var]"
-        },
         kp00 = {
           description = "[var]\n\nThe keypad 00 key on an American layout.",
+          signature = "[var]"
+        },
+        kp000 = {
+          description = "[var]\n\nThe keypad 000 key on an American layout.",
           signature = "[var]"
         },
         kp1 = {
