@@ -1,3 +1,5 @@
+require_bundle('lua')
+
 import command from howl
 import Process from howl.io
 
