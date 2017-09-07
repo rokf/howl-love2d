@@ -1,4 +1,5 @@
-### LÖVE bundle for Howl
+<p align="center"><img src="https://love2d.org/style/logo.png" width="128"></p>
+<h4 align="center">LÖVE bundle for Howl</h4>
 
 ![love2D shield](https://img.shields.io/badge/L%C3%96VE-v0.10.2-B1E3FA.svg) ![howl shield](https://img.shields.io/badge/Howl-master-4E63B5.svg)
 

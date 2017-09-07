@@ -422,6 +422,10 @@ return {
           description = "[fun] (mode: BufferMode, size: number) -> (success: boolean, errorstr: string)\n\nSets the buffer mode for a file opened for writing or appending.\nFiles with buffering enabled will not write data to the disk until the buffer size limit is reached, depending on the buffer mode.",
           signature = "[fun] (mode: BufferMode, size: number) -> (success: boolean, errorstr: string)"
         },
+        tell = {
+          description = "[fun] () -> (pos: number)\n\nReturns the position in the file.",
+          signature = "[fun] () -> (pos: number)"
+        },
         write = {
           description = "[fun] (data: string, size: number) -> (success: boolean)\n\nWrite data to a file.",
           signature = "[fun] (data: string, size: number) -> (success: boolean)"
@@ -590,8 +594,8 @@ return {
         signature = "[fun] (archive: string) -> (success: boolean)"
       },
       write = {
-        description = "[fun] (name: string, data: string, size: number) -> (success: boolean)\n\nWrite data to a file.\n\nIf you are getting the error message \"Could not set write directory\", try setting the save directory.\nThis is done either with love.filesystem.setIdentity or by setting the identity field in love.conf.",
-        signature = "[fun] (name: string, data: string, size: number) -> (success: boolean)"
+        description = "[fun] (name: string, data: string, size: number) -> (success: boolean, message: string)\n\nWrite data to a file.\n\nIf you are getting the error message \"Could not set write directory\", try setting the save directory.\nThis is done either with love.filesystem.setIdentity or by setting the identity field in love.conf.",
+        signature = "[fun] (name: string, data: string, size: number) -> (success: boolean, message: string)"
       }
     },
     focus = {
@@ -618,6 +622,10 @@ return {
       AlignMode = {
         center = {
           description = "[var]\n\nAlign text center.",
+          signature = "[var]"
+        },
+        justify = {
+          description = "[var]\n\nAlign text both left and right.",
           signature = "[var]"
         },
         left = {
@@ -1072,10 +1080,6 @@ return {
           description = "[fun] (vertexindex: number, attributeindex: number, value1: number, value2: number, ...: number) -> ()\n\nSets the properties of a specific attribute within a vertex in the Mesh.\n\nMeshes without a custom vertex format specified in love.graphics.newMesh have position as their first attribute, texture coordinates as their second attribute, and color as their third attribute.",
           signature = "[fun] (vertexindex: number, attributeindex: number, value1: number, value2: number, ...: number) -> ()"
         },
-        setVertexColors = {
-          description = "[fun] (on: boolean) -> ()\n\nSets if the per-vertex colors are used when rendering instead of the constant color (constant color being love.graphics.setColor or SpriteBatch:setColor)\n\nThe per-vertex colors are automatically enabled by default when making a new Mesh or when doing Mesh:setVertex, but only if at least one vertex color is not the default (255,255,255,255).",
-          signature = "[fun] (on: boolean) -> ()"
-        },
         setVertexMap = {
           description = "[fun] (map: table) -> ()\n\nSets the vertex map for the Mesh.\nThe vertex map describes the order in which the vertices are used when the Mesh is drawn.\nThe vertices, vertex map, and mesh draw mode work together to determine what exactly is displayed on the screen.\n\nThe vertex map allows you to re-order or reuse vertices when drawing without changing the actual vertex parameters or duplicating vertices.\nIt is especially useful when combined with different Mesh Draw Modes.",
           signature = "[fun] (map: table) -> ()"
@@ -1173,6 +1177,10 @@ return {
         getPosition = {
           description = "[fun] () -> (x: number, y: number)\n\nGets the position of the emitter.",
           signature = "[fun] () -> (x: number, y: number)"
+        },
+        getQuads = {
+          description = "[fun] () -> (quads: table)\n\nGets the series of Quads used for the particle sprites.",
+          signature = "[fun] () -> (quads: table)"
         },
         getRadialAcceleration = {
           description = "[fun] () -> (min: number, max: number)\n\nGet the radial acceleration (away from the emitter).",
@@ -1351,24 +1359,14 @@ return {
           signature = "[fun] (dt: number) -> ()"
         }
       },
-      PointStyle = {
-        rough = {
-          description = "[var]\n\nDraw rough points.",
-          signature = "[var]"
-        },
-        smooth = {
-          description = "[var]\n\nDraw smooth points.",
-          signature = "[var]"
-        }
-      },
       Quad = {
         getViewport = {
           description = "[fun] () -> (x: number, y: number, w: number, h: number)\n\nGets the current viewport of this Quad.",
           signature = "[fun] () -> (x: number, y: number, w: number, h: number)"
         },
         setViewport = {
-          description = "[fun] () -> (x: number, y: number, w: number, h: number)\n\nSets the texture coordinates according to a viewport.",
-          signature = "[fun] () -> (x: number, y: number, w: number, h: number)"
+          description = "[fun] (x: number, y: number, w: number, h: number) -> ()\n\nSets the texture coordinates according to a viewport.",
+          signature = "[fun] (x: number, y: number, w: number, h: number) -> ()"
         }
       },
       Shader = {
@@ -1688,8 +1686,8 @@ return {
         signature = "[fun] () -> (shader: Shader)"
       },
       getStats = {
-        description = "[fun] () -> (drawcalls: number, canvasswitches: number, texturememory: number, images: number, canvases: number, fonts: number, shaderswitches: number)\n\nGets performance-related rendering statistics.",
-        signature = "[fun] () -> (drawcalls: number, canvasswitches: number, texturememory: number, images: number, canvases: number, fonts: number, shaderswitches: number)"
+        description = "[fun] () -> (stats: table)\n\nGets performance-related rendering statistics.",
+        signature = "[fun] () -> (stats: table)"
       },
       getStencilTest = {
         description = "[fun] () -> (enabled: boolean, inverted: boolean)\n\nGets whether stencil testing is enabled.\n\nWhen stencil testing is enabled, the geometry of everything that is drawn will be clipped / stencilled out based on whether it intersects with what has been previously drawn to the stencil buffer.\n\nEach Canvas has its own stencil buffer.",
@@ -1828,8 +1826,8 @@ return {
         signature = "[fun] (mode: BlendMode) -> ()"
       },
       setCanvas = {
-        description = "[fun] (canvas: Canvas, ...: Canvas) -> ()\n\nCaptures drawing operations to a Canvas.",
-        signature = "[fun] (canvas: Canvas, ...: Canvas) -> ()"
+        description = "[fun] (canvas: Canvas) -> ()\n\nCaptures drawing operations to a Canvas.",
+        signature = "[fun] (canvas: Canvas) -> ()"
       },
       setColor = {
         description = "[fun] (red: number, green: number, blue: number, alpha: number) -> ()\n\nSets the color used for drawing.",
@@ -1907,8 +1905,8 @@ return {
           signature = "[fun] (level: number) -> (height: number)"
         },
         getMipmapCount = {
-          description = "[fun] (mipmaps: number) -> ()\n\nGets the number of mipmap levels in the CompressedImageData.\nThe base mipmap level (original image) is included in the count.",
-          signature = "[fun] (mipmaps: number) -> ()"
+          description = "[fun] () -> (mipmaps: number)\n\nGets the number of mipmap levels in the CompressedImageData.\nThe base mipmap level (original image) is included in the count.",
+          signature = "[fun] () -> (mipmaps: number)"
         },
         getWidth = {
           description = "[fun] (level: number) -> (width: number)\n\nGets the width of the CompressedImageData.",
@@ -3410,16 +3408,16 @@ return {
           description = "[var]\n\nThe keypad forward-slash key on an American layout.",
           signature = "[var]"
         },
-        kp000 = {
-          description = "[var]\n\nThe keypad 000 key on an American layout.",
+        kp0 = {
+          description = "[var]\n\nThe keypad '0' key on an American layout.",
           signature = "[var]"
         },
         kp00 = {
           description = "[var]\n\nThe keypad 00 key on an American layout.",
           signature = "[var]"
         },
-        kp0 = {
-          description = "[var]\n\nThe keypad '0' key on an American layout.",
+        kp000 = {
+          description = "[var]\n\nThe keypad 000 key on an American layout.",
           signature = "[var]"
         },
         kp1 = {
@@ -3795,7 +3793,7 @@ return {
           signature = "[fun] (index: number) -> ()"
         },
         render = {
-          description = "[fun] (depth: number) -> (coordinates: table)\n\nGet a list of coordinates to be used with love.graphics.line.\n\nThis function samples the Bézier curve using recursive subdivision.\nYou can control the recursion depth using the depth parameter.\n\nIf you are just interested to know the position on the curve given a parameter, use BezierCurve:evalulate.",
+          description = "[fun] (depth: number) -> (coordinates: table)\n\nGet a list of coordinates to be used with love.graphics.line.\n\nThis function samples the Bézier curve using recursive subdivision.\nYou can control the recursion depth using the depth parameter.\n\nIf you are just interested to know the position on the curve given a parameter, use BezierCurve:evaluate.",
           signature = "[fun] (depth: number) -> (coordinates: table)"
         },
         renderSegment = {
@@ -3890,8 +3888,8 @@ return {
         signature = "[fun] (vertices: table) -> (curve: BezierCurve)"
       },
       newRandomGenerator = {
-        description = "[fun] (low: number, high: number) -> (rng: RandomGenerator)\n\nCreates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.",
-        signature = "[fun] (low: number, high: number) -> (rng: RandomGenerator)"
+        description = "[fun] (seed: number) -> (rng: RandomGenerator)\n\nCreates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.",
+        signature = "[fun] (seed: number) -> (rng: RandomGenerator)"
       },
       noise = {
         description = "[fun] (x: number) -> (value: number)\n\nGenerates a Simplex or Perlin noise value in 1-4 dimensions.\nThe return value will always be the same, given the same arguments.\n\nSimplex noise is closely related to Perlin noise.\nIt is widely used for procedural content generation.\n\nThere are many webpages which discuss Perlin and Simplex noise in detail.",
@@ -4016,7 +4014,7 @@ return {
         signature = "[fun] () -> (visible: boolean)"
       },
       newCursor = {
-        description = "[fun] (imageData: ImageData, hotx: number, hoty: number) -> (cursor: Cursor)\n\nCreates a new hardware Cursor object from an image file or ImageData.\n\nHardware cursors are framerate-independent and work the same way as normal operating system cursors.\nUnlike drawing an image at the mouse's current coordinates, hardware cursors never have visible lag between when the mouse is moved and when the cursor position updates, even at low frameratesn\n\nThe hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is.\nFor example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.",
+        description = "[fun] (imageData: ImageData, hotx: number, hoty: number) -> (cursor: Cursor)\n\nCreates a new hardware Cursor object from an image file or ImageData.\n\nHardware cursors are framerate-independent and work the same way as normal operating system cursors.\nUnlike drawing an image at the mouse's current coordinates, hardware cursors never have visible lag between when the mouse is moved and when the cursor position updates, even at low framerates.\n\nThe hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is.\nFor example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.",
         signature = "[fun] (imageData: ImageData, hotx: number, hoty: number) -> (cursor: Cursor)"
       },
       setCursor = {
@@ -4107,7 +4105,7 @@ return {
           signature = "[fun] () -> (scale: number)"
         },
         getInertia = {
-          description = "[fun] () -> (inertia: number)\n\nGets the rotational inertia of the body.\n\nThe rotational inertia is how hard is it to make the body spin.\nIt is set with the 4th argument to Body:setMass, or automatically with Body:setMassFromShapes.",
+          description = "[fun] () -> (inertia: number)\n\nGets the rotational inertia of the body.\n\nThe rotational inertia is how hard is it to make the body spin.",
           signature = "[fun] () -> (inertia: number)"
         },
         getJointList = {
@@ -4223,7 +4221,7 @@ return {
           signature = "[fun] (active: boolean) -> ()"
         },
         setAngle = {
-          description = "[fun] (angle: number) -> ()\n\nSet the angle of the body.\n\nThe angle is measured in radians.\nIf you need to transform it from degrees, use math.rad.\n\nA value of 0 radians will mean \"looking to the right\".\n.Although radians increase counter-clockwise, the y-axis points down so it becomes clockwise from our point of view.\n\nIt is possible to cause a collision with another body by changing its angle.",
+          description = "[fun] (angle: number) -> ()\n\nSet the angle of the body.\n\nThe angle is measured in radians.\nIf you need to transform it from degrees, use math.rad.\n\nA value of 0 radians will mean \"looking to the right\".\nAlthough radians increase counter-clockwise, the y-axis points down so it becomes clockwise from our point of view.\n\nIt is possible to cause a collision with another body by changing its angle.",
           signature = "[fun] (angle: number) -> ()"
         },
         setAngularDamping = {
@@ -4251,7 +4249,7 @@ return {
           signature = "[fun] (scale: number) -> ()"
         },
         setInertia = {
-          description = "[fun] (inertia: number) -> ()\n\nSet the inertia of a body.\n\nThis value can also be set by the fourth argument of Body:setMass.",
+          description = "[fun] (inertia: number) -> ()\n\nSet the inertia of a body.",
           signature = "[fun] (inertia: number) -> ()"
         },
         setLinearDamping = {
@@ -4934,10 +4932,6 @@ return {
           description = "[fun] () -> (position: number)\n\nReturns the current joint translation.",
           signature = "[fun] () -> (position: number)"
         },
-        getLimits = {
-          description = "[fun] () -> (lower: number, upper: number)\n\nGets the joint limits.",
-          signature = "[fun] () -> (lower: number, upper: number)"
-        },
         getMaxMotorTorque = {
           description = "[fun] () -> (maxTorque: number)\n\nReturns the maximum motor torque.",
           signature = "[fun] () -> (maxTorque: number)"
@@ -5179,7 +5173,7 @@ return {
           signature = "[fun] () -> (channels: number)"
         },
         getDuration = {
-          description = "[fun] () -> (duration: number)\n\nReturns the number of channels in the stream.",
+          description = "[fun] () -> (duration: number)\n\nGets the duration of the sound data.",
           signature = "[fun] () -> (duration: number)"
         },
         getSample = {
