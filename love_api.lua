@@ -31,12 +31,16 @@ return {
           signature = "[var]"
         }
       },
+      RecordingDevice = {
+        description = "[var]\n\nRepresents an audio input device capable of recording sounds.",
+        signature = "[var]"
+      },
       Source = {
         getAttenuationDistances = {
           description = "[fun] () -> (ref: number, max: number)\n\nReturns the reference and maximum distance of the source.",
           signature = "[fun] () -> (ref: number, max: number)"
         },
-        getChannels = {
+        getChannelCount = {
           description = "[fun] () -> (channels: number)\n\nGets the number of channels in the Source.\nOnly 1-channel (mono) Sources can use directional and positional effects.",
           signature = "[fun] () -> (channels: number)"
         },
@@ -185,6 +189,10 @@ return {
           signature = "[var]"
         }
       },
+      getDistanceModel = {
+        description = "[fun] () -> (model: DistanceModel)\n\nReturns the distance attenuation model.",
+        signature = "[fun] () -> (model: DistanceModel)"
+      },
       getDopplerScale = {
         description = "[fun] () -> (scale: number)\n\nGets the current global scale factor for velocity-based doppler effects.",
         signature = "[fun] () -> (scale: number)"
@@ -270,7 +278,7 @@ return {
       description = "[fun] () -> ()\n\nCallback function used to draw on the screen every frame.",
       signature = "[fun] () -> ()"
     },
-    errhand = {
+    errorhandler = {
       description = "[fun] (msg: string) -> ()\n\nThe error handler, used to display error messages.",
       signature = "[fun] (msg: string) -> ()"
     },
@@ -465,6 +473,24 @@ return {
           signature = "[var]"
         }
       },
+      FileType = {
+        directory = {
+          description = "[var]\n\nDirectory",
+          signature = "[var]"
+        },
+        file = {
+          description = "[var]\n\nRegular file.",
+          signature = "[var]"
+        },
+        other = {
+          description = "[var]\n\nSomething completely different like a device.",
+          signature = "[var]"
+        },
+        symlink = {
+          description = "[var]\n\nSymbolic link.",
+          signature = "[var]"
+        }
+      },
       areSymlinksEnabled = {
         description = "[fun] () -> (enable: boolean)\n\nGets whether love.filesystem follows symbolic links.",
         signature = "[fun] () -> (enable: boolean)"
@@ -473,13 +499,13 @@ return {
         description = "[fun] (name: string) -> (success: boolean)\n\nCreates a directory.",
         signature = "[fun] (name: string) -> (success: boolean)"
       },
-      exists = {
-        description = "[fun] (filename: string) -> (exists: boolean)\n\nCheck whether a file or directory exists.",
-        signature = "[fun] (filename: string) -> (exists: boolean)"
-      },
       getAppdataDirectory = {
         description = "[fun] () -> (path: string)\n\nReturns the application data directory (could be the same as getUserDirectory)",
         signature = "[fun] () -> (path: string)"
+      },
+      getCRequirePath = {
+        description = "[fun] () -> (paths: string)\n\nGets the filesystem paths that will be searched for c libraries when require is called.\n\nThe paths string returned by this function is a sequence of path templates separated by semicolons.\nThe argument passed to require will be inserted in place of any question mark (\"?\") character in each template (after the dot characters in the argument passed to require are replaced by directory separators.) Additionally, any occurrence of a double question mark (\"??\") will be replaced by the name passed to require and the default library extension for the platform.\n\nThe paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.",
+        signature = "[fun] () -> (paths: string)"
       },
       getDirectoryItems = {
         description = "[fun] (dir: string) -> (items: table)\n\nReturns a table with the names of files and subdirectories in the specified path.\nThe table is not sorted in any way; the order is undefined.\n\nIf the path passed to the function exists in the game and the save directory, it will list the files and directories from both places.",
@@ -489,9 +515,9 @@ return {
         description = "[fun] (name: string) -> ()\n\nGets the write directory name for your game.\nNote that this only returns the name of the folder to store your files in, not the full location.",
         signature = "[fun] (name: string) -> ()"
       },
-      getLastModified = {
-        description = "[fun] (filename: string) -> (modtime: number, errormsg: string)\n\nGets the last modification time of a file.",
-        signature = "[fun] (filename: string) -> (modtime: number, errormsg: string)"
+      getInfo = {
+        description = "[fun] (path: string) -> (info: table)\n\nGets information about the specified file or directory.",
+        signature = "[fun] (path: string) -> (info: table)"
       },
       getRealDirectory = {
         description = "[fun] (filepath: string) -> (realdir: string)\n\nGets the platform-specific absolute path of the directory containing a filepath.\n\nThis can be used to determine whether a file is inside the save directory or the game's source .love.",
@@ -504,10 +530,6 @@ return {
       getSaveDirectory = {
         description = "[fun] () -> (path: string)\n\nGets the full path to the designated save directory.\nThis can be useful if you want to use the standard io library (or something else) to read or write in the save directory.",
         signature = "[fun] () -> (path: string)"
-      },
-      getSize = {
-        description = "[fun] (filename: string) -> (size: number, errormsg: string)\n\nGets the size in bytes of a file.",
-        signature = "[fun] (filename: string) -> (size: number, errormsg: string)"
       },
       getSource = {
         description = "[fun] () -> (path: string)\n\nReturns the full path to the the .love file or directory.\nIf the game is fused to the LÖVE executable, then the executable is returned.",
@@ -529,21 +551,9 @@ return {
         description = "[fun] (appname: string) -> ()\n\nInitializes love.filesystem, will be called internally, so should not be used explicitly.",
         signature = "[fun] (appname: string) -> ()"
       },
-      isDirectory = {
-        description = "[fun] (path: string) -> (isDir: boolean)\n\nCheck whether something is a directory.",
-        signature = "[fun] (path: string) -> (isDir: boolean)"
-      },
-      isFile = {
-        description = "[fun] (path: string) -> (isFile: boolean)\n\nCheck whether something is a file.",
-        signature = "[fun] (path: string) -> (isFile: boolean)"
-      },
       isFused = {
         description = "[fun] () -> (fused: boolean)\n\nGets whether the game is in fused mode or not.\n\nIf a game is in fused mode, its save directory will be directly in the Appdata directory instead of Appdata/LOVE/.\nThe game will also be able to load C Lua dynamic libraries which are located in the save directory.\n\nA game is in fused mode if the source .love has been fused to the executable (see Game Distribution), or if \"--fused\" has been given as a command-line argument when starting the game.",
         signature = "[fun] () -> (fused: boolean)"
-      },
-      isSymlink = {
-        description = "[fun] (path: string) -> (symlink: boolean)\n\nGets whether a filepath is actually a symbolic link.\n\nIf symbolic links are not enabled (via love.filesystem.setSymlinksEnabled), this function will always return false.",
-        signature = "[fun] (path: string) -> (symlink: boolean)"
       },
       lines = {
         description = "[fun] (name: string) -> (iterator: function)\n\nIterate over the lines in a file.",
@@ -572,6 +582,10 @@ return {
       remove = {
         description = "[fun] (name: string) -> (success: boolean)\n\nRemoves a file or directory.",
         signature = "[fun] (name: string) -> (success: boolean)"
+      },
+      setCRequirePath = {
+        description = "[fun] (paths: string) -> ()\n\nSets the filesystem paths that will be searched for c libraries when require is called.\n\nThe paths string returned by this function is a sequence of path templates separated by semicolons.\nThe argument passed to require will be inserted in place of any question mark (\"?\") character in each template (after the dot characters in the argument passed to require are replaced by directory separators.) Additionally, any occurrence of a double question mark (\"??\") will be replaced by the name passed to require and the default library extension for the platform.\n\nThe paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.",
+        signature = "[fun] (paths: string) -> ()"
       },
       setIdentity = {
         description = "[fun] (name: string, appendToPath: boolean) -> ()\n\nSets the write directory for your game.\nNote that you can only set the name of the folder to store your files in, not the location.",
@@ -603,8 +617,8 @@ return {
       signature = "[fun] (focus: boolean) -> ()"
     },
     gamepadaxis = {
-      description = "[fun] (joystick: Joystick, axis: GamepadAxis) -> ()\n\nCalled when a Joystick's virtual gamepad axis is moved.",
-      signature = "[fun] (joystick: Joystick, axis: GamepadAxis) -> ()"
+      description = "[fun] (joystick: Joystick, axis: GamepadAxis, value: number) -> ()\n\nCalled when a Joystick's virtual gamepad axis is moved.",
+      signature = "[fun] (joystick: Joystick, axis: GamepadAxis, value: number) -> ()"
     },
     gamepadpressed = {
       description = "[fun] (joystick: Joystick, button: GamepadButton) -> ()\n\nCalled when a Joystick's virtual gamepad button is pressed.",
@@ -982,6 +996,10 @@ return {
           description = "[fun] (x: number, y: number, width: number, height: number) -> ()\n\nReloads the Image's contents from the ImageData or CompressedImageData used to create the image.",
           signature = "[fun] (x: number, y: number, width: number, height: number) -> ()"
         },
+        replacePixels = {
+          description = "[fun] (data: ImageData, slice: number, mipmap: number) -> ()\n\nReplaces the contents of an Image.",
+          signature = "[fun] (data: ImageData, slice: number, mipmap: number) -> ()"
+        },
         setFilter = {
           description = "[fun] (min: FilterMode, mag: FilterMode) -> ()\n\nSets the filter mode for an image.",
           signature = "[fun] (min: FilterMode, mag: FilterMode) -> ()"
@@ -1020,6 +1038,10 @@ return {
         }
       },
       Mesh = {
+        detachAttribute = {
+          description = "[fun] (name: string) -> (success: boolean)\n\nRemoves a previously attached vertex attribute from this Mesh.",
+          signature = "[fun] (name: string) -> (success: boolean)"
+        },
         getDrawMode = {
           description = "[fun] () -> (mode: MeshDrawMode)\n\nGets the mode used when drawing the Mesh.",
           signature = "[fun] () -> (mode: MeshDrawMode)"
@@ -1374,6 +1396,10 @@ return {
           description = "[fun] () -> (warnings: string)\n\nReturns any warning and error messages from compiling the shader code.\nThis can be used for debugging your shaders if there's anything the graphics hardware doesn't like.",
           signature = "[fun] () -> (warnings: string)"
         },
+        hasUniform = {
+          description = "[fun] (name: string) -> (hasuniform: boolean)\n\nGets whether a uniform / extern variable exists in the Shader.\n\nIf a graphics driver's shader compiler determines that a uniform / extern variable doesn't affect the final output of the shader, it may optimize the variable out.\nThis function will return false in that case.",
+          signature = "[fun] (name: string) -> (hasuniform: boolean)"
+        },
         send = {
           description = "[fun] (name: string, number: number, ...: number) -> ()\n\nSends one or more values to a special (uniform) variable inside the shader.\nUniform variables have to be marked using the uniform or extern keyword.",
           signature = "[fun] (name: string, number: number, ...: number) -> ()"
@@ -1385,7 +1411,7 @@ return {
       },
       SpriteBatch = {
         attachAttribute = {
-          description = "[fun] (name: string, mesh: Mesh) -> ()\n\nAttaches a per-vertex attribute from a Mesh onto this SpriteBatch, for use when drawing.\nThis can be combined with a Shader to augment a SpriteBatch with per-vertex or additional per-sprite information instead of just having per-sprite colors.\n\nEach sprite in a SpriteBatch has 4 vertices in the following order: top-left, bottom-left, top-right, bottom-right.\nThe index returned by SpriteBatch:add (and used by SpriteBatch:set) can be multiplied by 4 to determine the first vertex in a specific sprite.",
+          description = "[fun] (name: string, mesh: Mesh) -> ()\n\nAttaches a per-vertex attribute from a Mesh onto this SpriteBatch, for use when drawing.\nThis can be combined with a Shader to augment a SpriteBatch with per-vertex or additional per-sprite information instead of just having per-sprite colors.\n\nEach sprite in a SpriteBatch has 4 vertices in the following order: top-left, bottom-left, top-right, bottom-right.\nThe index returned by SpriteBatch:add (and used by SpriteBatch:set) can used to determine the first vertex of a specific sprite with the formula \"1 + 4 * ( id - 1 )\".",
           signature = "[fun] (name: string, mesh: Mesh) -> ()"
         },
         clear = {
@@ -1423,6 +1449,10 @@ return {
         setColor = {
           description = "[fun] (r: number, g: number, b: number, a: number) -> ()\n\nSets the color that will be used for the next add and set operations.\nCalling the function without arguments will clear the color.\n\nIn version [[0.9.2]] and older, the global color set with love.graphics.setColor will not work on the SpriteBatch if any of the sprites has its own color.",
           signature = "[fun] (r: number, g: number, b: number, a: number) -> ()"
+        },
+        setDrawRange = {
+          description = "[fun] (start: number, count: number) -> ()\n\nRestricts the drawn sprites in the SpriteBatch to a subset of the total.",
+          signature = "[fun] (start: number, count: number) -> ()"
         },
         setTexture = {
           description = "[fun] (texture: Texture) -> ()\n\nReplaces the Image or Canvas used for the sprites.",
@@ -1518,8 +1548,26 @@ return {
         }
       },
       Texture = {
-        description = "[var]\n\nSuperclass for drawable objects which represent a texture.\nAll Textures can be drawn with Quads.\nThis is an abstract type that can't be created directly.",
-        signature = "[var]"
+        getFormat = {
+          description = "[fun] () -> (format: PixelFormat)\n\nGets the PixelFormat of the Texture.",
+          signature = "[fun] () -> (format: PixelFormat)"
+        },
+        getLayerCount = {
+          description = "[fun] () -> (layers: number)\n\nGets the number of layers / slices in an Array Texture.\nReturns 1 for 2D, Cubemap, and Volume textures.",
+          signature = "[fun] () -> (layers: number)"
+        },
+        getMipmapCount = {
+          description = "[fun] () -> (mipmaps: number)\n\nGets the number of mipmaps contained in the Texture.\nIf the texture was not created with mipmaps, it will return 1.",
+          signature = "[fun] () -> (mipmaps: number)"
+        },
+        getTextureType = {
+          description = "[fun] () -> (texturetype: TextureType)\n\nGets the type of the Texture.",
+          signature = "[fun] () -> (texturetype: TextureType)"
+        },
+        isReadable = {
+          description = "[fun] () -> (readable: boolean)\n\nGets whether the Texture can be drawn and sent to a Shader.\n\nCanvases created with stencil and/or depth PixelFormats are not readable by default, unless readable=true is specified in the settings table passed into love.graphics.newCanvas.\n\nNon-readable Canvases can still be rendered to.",
+          signature = "[fun] () -> (readable: boolean)"
+        }
       },
       Video = {
         getFilter = {
@@ -1593,6 +1641,14 @@ return {
           signature = "[var]"
         }
       },
+      applyTransform = {
+        description = "[fun] (transform: Transform) -> ()\n\nApplies the given Transform object to the current coordinate transformation.\n\nThis effectively multiplies the existing coordinate transformation's matrix with the Transform object's internal matrix to produce the new coordinate transformation.",
+        signature = "[fun] (transform: Transform) -> ()"
+      },
+      captureScreenshot = {
+        description = "[fun] (filename: string) -> ()\n\nCreates a screenshot once the current frame is done (after love.draw has finished).\n\nSince this function enqueues a screenshot capture rather than executing it immediately, it can be called from an input callback or love.update and it will still capture all of what's drawn to the screen in that frame.",
+        signature = "[fun] (filename: string) -> ()"
+      },
       circle = {
         description = "[fun] (mode: DrawMode, x: number, y: number, radius: number) -> ()\n\nDraws a circle.",
         signature = "[fun] (mode: DrawMode, x: number, y: number, radius: number) -> ()"
@@ -1606,12 +1662,24 @@ return {
         signature = "[fun] (discardcolor: boolean, discardstencil: boolean) -> ()"
       },
       draw = {
-        description = "[fun] (drawable: Drawable, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws a Drawable object (an Image, Canvas, SpriteBatch, ParticleSystem, Mesh, or Video) on the screen with optional rotation, scaling and shearing.\n\nObjects are drawn relative to their local coordinate system.\nThe origin is by default located at the top left corner of Image and Canvas.\nAll scaling, shearing, and rotation arguments transform the object relative to that point.\nAlso, the position of the origin can be specified on the screen coordinate system.\n\nIt's possible to rotate an object about its center by offsetting the origin to the center.\nAngles must be given in radians for rotation.\nOne can also use a negative scaling factor to flip about its centerline.\n\nNote that the offsets are applied before rotation, scaling, or shearing; scaling and shearing are applied before rotation.\n\nThe right and bottom edges of the object are shifted at an angle defined by the shearing factors.",
+        description = "[fun] (drawable: Drawable, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws a Drawable object (an Image, Canvas, SpriteBatch, ParticleSystem, Mesh, Text object, or Video) on the screen with optional rotation, scaling and shearing.\n\nObjects are drawn relative to their local coordinate system.\nThe origin is by default located at the top left corner of Image and Canvas.\nAll scaling, shearing, and rotation arguments transform the object relative to that point.\nAlso, the position of the origin can be specified on the screen coordinate system.\n\nIt's possible to rotate an object about its center by offsetting the origin to the center.\nAngles must be given in radians for rotation.\nOne can also use a negative scaling factor to flip about its centerline.\n\nNote that the offsets are applied before rotation, scaling, or shearing; scaling and shearing are applied before rotation.\n\nThe right and bottom edges of the object are shifted at an angle defined by the shearing factors.",
         signature = "[fun] (drawable: Drawable, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()"
+      },
+      drawInstanced = {
+        description = "[fun] (mesh: Mesh, instancecount: number, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws many instances of a Mesh with a single draw call, using hardware geometry instancing.\n\nEach instance can have unique properties (positions, colors, etc.) but will not by default unless a custom Shader along with either per-instance attributes or the love_InstanceID GLSL 3 vertex shader variable is used, otherwise they will all render at the same position on top of each other.\n\nInstancing is not supported by some older GPUs that are only capable of using OpenGL ES 2 or OpenGL 2.\nUse love.graphics.getSupported to check.",
+        signature = "[fun] (mesh: Mesh, instancecount: number, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()"
+      },
+      drawLayer = {
+        description = "[fun] (texture: Texture, layerindex: number, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws a layer of an Array Texture.",
+        signature = "[fun] (texture: Texture, layerindex: number, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()"
       },
       ellipse = {
         description = "[fun] (mode: DrawMode, x: number, y: number, radiusx: number, radiusy: number) -> ()\n\nDraws an ellipse.",
         signature = "[fun] (mode: DrawMode, x: number, y: number, radiusx: number, radiusy: number) -> ()"
+      },
+      flushBatch = {
+        description = "[var]\n\nImmediately renders any pending automatically batched draws.\n\nLÖVE will call this function internally as needed when most state is changed, so it is not necessary to manually call it.\n\nThe current batch will be automatically flushed by love.graphics state changes (except for the transform stack and the current color), as well as Shader:send and methods on Textures which change their state.\nUsing a different Image in consecutive love.graphics.draw calls will also flush the current batch.\n\nSpriteBatches, ParticleSystems, Meshes, and Text objects do their own batching and do not affect automatic batching of other draws.",
+        signature = "[var]"
       },
       getBackgroundColor = {
         description = "[fun] () -> (r: number, g: number, b: number, a: number)\n\nGets the current background color.",
@@ -1645,6 +1713,10 @@ return {
         description = "[fun] () -> (min: FilterMode, mag: FilterMode, anisotropy: number)\n\nReturns the default scaling filters used with Images, Canvases, and Fonts.",
         signature = "[fun] () -> (min: FilterMode, mag: FilterMode, anisotropy: number)"
       },
+      getDepthMode = {
+        description = "[fun] () -> (comparemode: CompareMode, write: boolean)\n\nGets the current depth test mode and whether writing to the depth buffer is enabled.\n\nThis is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes.\nNo higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.",
+        signature = "[fun] () -> (comparemode: CompareMode, write: boolean)"
+      },
       getDimensions = {
         description = "[fun] () -> (width: number, height: number)\n\nGets the width and height of the window.",
         signature = "[fun] () -> (width: number, height: number)"
@@ -1652,6 +1724,10 @@ return {
       getFont = {
         description = "[fun] () -> (font: Font)\n\nGets the current Font object.",
         signature = "[fun] () -> (font: Font)"
+      },
+      getFrontFaceWinding = {
+        description = "[fun] () -> (winding: VertexWinding)\n\nGets whether triangles with clockwise- or counterclockwise-ordered vertices are considered front-facing.\n\nThis is designed for use in combination with Mesh face culling.\nOther love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.",
+        signature = "[fun] () -> (winding: VertexWinding)"
       },
       getHeight = {
         description = "[fun] () -> (height: number)\n\nGets the height of the window.",
@@ -1669,6 +1745,10 @@ return {
         description = "[fun] () -> (width: number)\n\nGets the current line width.",
         signature = "[fun] () -> (width: number)"
       },
+      getMeshCullMode = {
+        description = "[fun] () -> (mode: CullMode)\n\nGets whether back-facing triangles in a Mesh are culled.\n\nMesh face culling is designed for use with low level custom hardware-accelerated 3D rendering via custom vertex attributes on Meshes, custom vertex shaders, and depth testing with a depth buffer.",
+        signature = "[fun] () -> (mode: CullMode)"
+      },
       getPointSize = {
         description = "[fun] () -> (size: number)\n\nGets the point size.",
         signature = "[fun] () -> (size: number)"
@@ -1684,6 +1764,10 @@ return {
       getShader = {
         description = "[fun] () -> (shader: Shader)\n\nReturns the current Shader.\nReturns nil if none is set.",
         signature = "[fun] () -> (shader: Shader)"
+      },
+      getStackDepth = {
+        description = "[fun] () -> (depth: number)\n\nGets the current depth of the transform / state stack (the number of pushes without corresponding pops).",
+        signature = "[fun] () -> (depth: number)"
       },
       getStats = {
         description = "[fun] () -> (stats: table)\n\nGets performance-related rendering statistics.",
@@ -1701,6 +1785,10 @@ return {
         description = "[fun] () -> (limits: table)\n\nGets the system-dependent maximum values for love.graphics features.",
         signature = "[fun] () -> (limits: table)"
       },
+      getTextureTypes = {
+        description = "[fun] () -> (texturetypes: table)\n\nGets the available texture types, and whether each is supported.",
+        signature = "[fun] () -> (texturetypes: table)"
+      },
       getWidth = {
         description = "[fun] () -> (width: number)\n\nGets the width of the window.",
         signature = "[fun] () -> (width: number)"
@@ -1708,6 +1796,10 @@ return {
       intersectScissor = {
         description = "[fun] (x: number, y: number, width: number, height: number) -> ()\n\nSets the scissor to the rectangle created by the intersection of the specified rectangle with the existing scissor.\nIf no scissor is active yet, it behaves like love.graphics.setScissor.\n\nThe scissor limits the drawing area to a specified rectangle.\nThis affects all graphics calls, including love.graphics.clear.\n\nThe dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).",
         signature = "[fun] (x: number, y: number, width: number, height: number) -> ()"
+      },
+      inverseTransformPoint = {
+        description = "[fun] (screenX: number, screenY: number) -> (globalX: number, globalY: number)\n\nConverts the given 2D position from screen-space into global coordinates.\n\nThis effectively applies the reverse of the current graphics transformations to the given position.\nA similar Transform:inverseTransformPoint method exists for Transform objects.",
+        signature = "[fun] (screenX: number, screenY: number) -> (globalX: number, globalY: number)"
       },
       isGammaCorrect = {
         description = "[fun] () -> (gammacorrect: boolean)\n\nGets whether gamma-correct rendering is supported and enabled.\nIt can be enabled by setting t.gammacorrect = true in love.conf.\n\nNot all devices support gamma-correct rendering, in which case it will be automatically disabled and this function will return false.\nIt is supported on desktop systems which have graphics cards that are capable of using OpenGL 3 / DirectX 10, and iOS devices that can use OpenGL ES 3.",
@@ -1749,10 +1841,6 @@ return {
         description = "[fun] (x: number, y: number, width: number, height: number, sw: number, sh: number) -> (quad: Quad)\n\nCreates a new Quad.\n\nThe purpose of a Quad is to describe the result of the following transformation on any drawable object.\nThe object is first scaled to dimensions sw * sh.\nThe Quad then describes the rectangular area of dimensions width * height whose upper left corner is at position (x, y) inside the scaled object.",
         signature = "[fun] (x: number, y: number, width: number, height: number, sw: number, sh: number) -> (quad: Quad)"
       },
-      newScreenshot = {
-        description = "[fun] (copyAlpha: boolean) -> (screenshot: ImageData)\n\nCreates a screenshot and returns the image data.",
-        signature = "[fun] (copyAlpha: boolean) -> (screenshot: ImageData)"
-      },
       newShader = {
         description = "[fun] (code: string) -> (shader: Shader)\n\nCreates a new Shader object for hardware-accelerated vertex and pixel effects.\nA Shader contains either vertex shader code, pixel shader code, or both.\n\nVertex shader code must contain at least one function, named position, which is the function that will produce transformed vertex positions of drawn objects in screen-space.\n\nPixel shader code must contain at least one function, named effect, which is the function that will produce the color which is blended onto the screen for each pixel a drawn object touches.",
         signature = "[fun] (code: string) -> (shader: Shader)"
@@ -1762,7 +1850,7 @@ return {
         signature = "[fun] (texture: Texture, maxsprites: number, usage: SpriteBatchUsage) -> (spriteBatch: SpriteBatch)"
       },
       newText = {
-        description = "[fun] (font: Font, textstring: string) -> (text: Text)\n\nCreates a new Font.",
+        description = "[fun] (font: Font, textstring: string) -> (text: Text)\n\nCreates a new drawable Text object.",
         signature = "[fun] (font: Font, textstring: string) -> (text: Text)"
       },
       newVideo = {
@@ -1790,7 +1878,7 @@ return {
         signature = "[fun] () -> ()"
       },
       print = {
-        description = "[fun] (text: string, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws text on screen.\nIf no Font is set, one will be created and set (once) if needed.\n\nAs of LOVE 0.7.1, when using translation and scaling functions while drawing text, this function assumes the scale occurs first.\nIf you don't script with this in mind, the text won't be in the right position, or possibly even on screen.\n\nlove.graphics.print and love.graphics.printf both suppport UTF-8 encoding.\nYou'll also need a proper Font for special characters.",
+        description = "[fun] (text: string, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()\n\nDraws text on screen.\nIf no Font is set, one will be created and set (once) if needed.\n\nAs of LOVE 0.7.1, when using translation and scaling functions while drawing text, this function assumes the scale occurs first.\nIf you don't script with this in mind, the text won't be in the right position, or possibly even on screen.\n\nlove.graphics.print and love.graphics.printf both support UTF-8 encoding.\nYou'll also need a proper Font for special characters.",
         signature = "[fun] (text: string, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> ()"
       },
       printf = {
@@ -1804,6 +1892,10 @@ return {
       rectangle = {
         description = "[fun] (mode: DrawMode, x: number, y: number, width: number, height: number) -> ()\n\nDraws a rectangle.",
         signature = "[fun] (mode: DrawMode, x: number, y: number, width: number, height: number) -> ()"
+      },
+      replaceTransform = {
+        description = "[fun] (transform: Transform) -> ()\n\nReplaces the current coordinate transformation with the given Transform object.",
+        signature = "[fun] (transform: Transform) -> ()"
       },
       reset = {
         description = "[fun] () -> ()\n\nResets the current graphics settings.\n\nCalling reset makes the current drawing color white, the current background color black, resets any active Canvas or Shader, and removes any scissor settings.\nIt sets the BlendMode to alpha.\nIt also sets both the point and line drawing modes to smooth and their sizes to 1.0.",
@@ -1841,9 +1933,17 @@ return {
         description = "[fun] (min: FilterMode, mag: FilterMode, anisotropy: number) -> ()\n\nSets the default scaling filters used with Images, Canvases, and Fonts.\n\nThis function does not apply retroactively to loaded images.",
         signature = "[fun] (min: FilterMode, mag: FilterMode, anisotropy: number) -> ()"
       },
+      setDepthMode = {
+        description = "[fun] (comparemode: CompareMode, write: boolean) -> ()\n\nConfigures depth testing and writing to the depth buffer.\n\nThis is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes.\nNo higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.",
+        signature = "[fun] (comparemode: CompareMode, write: boolean) -> ()"
+      },
       setFont = {
         description = "[fun] (font: Font) -> ()\n\nSet an already-loaded Font as the current font or create and load a new one from the file and size.\n\nIt's recommended that Font objects are created with love.graphics.newFont in the loading stage and then passed to this function in the drawing stage.",
         signature = "[fun] (font: Font) -> ()"
+      },
+      setFrontFaceWinding = {
+        description = "[fun] (winding: VertexWinding) -> ()\n\nSets whether triangles with clockwise- or counterclockwise-ordered vertices are considered front-facing.\n\nThis is designed for use in combination with Mesh face culling.\nOther love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.",
+        signature = "[fun] (winding: VertexWinding) -> ()"
       },
       setLineJoin = {
         description = "[fun] (join: LineJoin) -> ()\n\nSets the line join style.",
@@ -1856,6 +1956,10 @@ return {
       setLineWidth = {
         description = "[fun] (width: number) -> ()\n\nSets the line width.",
         signature = "[fun] (width: number) -> ()"
+      },
+      setMeshCullMode = {
+        description = "[fun] (mode: CullMode) -> ()\n\nSets whether back-facing triangles in a Mesh are culled.\n\nThis is designed for use with low level custom hardware-accelerated 3D rendering via custom vertex attributes on Meshes, custom vertex shaders, and depth testing with a depth buffer.",
+        signature = "[fun] (mode: CullMode) -> ()"
       },
       setNewFont = {
         description = "[fun] (filename: string, size: number) -> (font: Font)\n\nCreates and sets a new font.",
@@ -1889,10 +1993,22 @@ return {
         description = "[fun] (stencilfunction: function, action: StencilAction, value: number, keepvalues: boolean) -> ()\n\nDraws geometry as a stencil.\n\nThe geometry drawn by the supplied function sets invisible stencil values of pixels, instead of setting pixel colors.\nThe stencil values of pixels can act like a mask / stencil - love.graphics.setStencilTest can be used afterward to determine how further rendering is affected by the stencil values in each pixel.\n\nEach Canvas has its own per-pixel stencil values.\nStencil values are within the range of [0, 255].",
         signature = "[fun] (stencilfunction: function, action: StencilAction, value: number, keepvalues: boolean) -> ()"
       },
+      transformPoint = {
+        description = "[fun] (globalX: number, globalY: number) -> (screenX: number, sreenY: number)\n\nConverts the given 2D position from global coordinates into screen-space.\n\nThis effectively applies the current graphics transformations to the given position.\nA similar Transform:transformPoint method exists for Transform objects.",
+        signature = "[fun] (globalX: number, globalY: number) -> (screenX: number, sreenY: number)"
+      },
       translate = {
         description = "[fun] (dx: number, dy: number) -> ()\n\nTranslates the coordinate system in two dimensions.\n\nWhen this function is called with two numbers, dx, and dy, all the following drawing operations take effect as if their x and y coordinates were x+dx and y+dy.\n\nScale and translate are not commutative operations, therefore, calling them in different orders will change the outcome.\n\nThis change lasts until love.graphics.clear is called (which is called automatically before love.draw in the default love.run function), or a love.graphics.pop reverts to a previous coordinate system state.\n\nTranslating using whole numbers will prevent tearing/blurring of images and fonts draw after translating.",
         signature = "[fun] (dx: number, dy: number) -> ()"
+      },
+      validateShader = {
+        description = "[fun] (gles: boolean, code: string) -> (status: boolean, message: string)\n\nValidates shader code.\nCheck if specificed shader code does not contain any errors.",
+        signature = "[fun] (gles: boolean, code: string) -> (status: boolean, message: string)"
       }
+    },
+    hasDeprecationOutput = {
+      description = "[fun] () -> (enabled: boolean)\n\nGets whether LÖVE displays warnings when using deprecated functionality.\nIt is disabled by default in fused mode, and enabled by default otherwise.\n\nWhen deprecation output is enabled, the first use of a formally deprecated LÖVE API will show a message at the bottom of the screen for a short time, and print the message to the console.",
+      signature = "[fun] () -> (enabled: boolean)"
     },
     image = {
       CompressedImageData = {
@@ -3408,16 +3524,16 @@ return {
           description = "[var]\n\nThe keypad forward-slash key on an American layout.",
           signature = "[var]"
         },
+        kp000 = {
+          description = "[var]\n\nThe keypad 000 key on an American layout.",
+          signature = "[var]"
+        },
         kp0 = {
           description = "[var]\n\nThe keypad '0' key on an American layout.",
           signature = "[var]"
         },
         kp00 = {
           description = "[var]\n\nThe keypad 00 key on an American layout.",
-          signature = "[var]"
-        },
-        kp000 = {
-          description = "[var]\n\nThe keypad 000 key on an American layout.",
           signature = "[var]"
         },
         kp1 = {
@@ -3891,6 +4007,10 @@ return {
         description = "[fun] (seed: number) -> (rng: RandomGenerator)\n\nCreates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.",
         signature = "[fun] (seed: number) -> (rng: RandomGenerator)"
       },
+      newTransformation = {
+        description = "[fun] (x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> (transform: Transform)\n\nCreates a new Transform object.",
+        signature = "[fun] (x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number) -> (transform: Transform)"
+      },
       noise = {
         description = "[fun] (x: number) -> (value: number)\n\nGenerates a Simplex or Perlin noise value in 1-4 dimensions.\nThe return value will always be the same, given the same arguments.\n\nSimplex noise is closely related to Perlin noise.\nIt is widely used for procedural content generation.\n\nThere are many webpages which discuss Perlin and Simplex noise in detail.",
         signature = "[fun] (x: number) -> (value: number)"
@@ -4000,6 +4120,10 @@ return {
       hasCursor = {
         description = "[fun] () -> (hascursor: boolean)\n\nGets whether cursor functionality is supported.\n\nIf it isn't supported, calling love.mouse.newCursor and love.mouse.getSystemCursor will cause an error.\nMobile devices do not support cursors.",
         signature = "[fun] () -> (hascursor: boolean)"
+      },
+      isCursorSupported = {
+        description = "[fun] () -> (supported: boolean)\n\nGets whether cursor functionality is supported.\n\nIf it isn't supported, calling love.mouse.newCursor and love.mouse.getSystemCursor will cause an error.\nMobile devices do not support cursors.",
+        signature = "[fun] () -> (supported: boolean)"
       },
       isDown = {
         description = "[fun] (button: number, ...: number) -> (down: boolean)\n\nChecks whether a certain mouse button is down.\nThis function does not detect mousewheel scrolling; you must use the love.wheelmoved (or love.mousepressed in version 0.9.2 and older) callback for that.",
@@ -4690,6 +4814,10 @@ return {
         }
       },
       PrismaticJoint = {
+        getAxis = {
+          description = "[fun] () -> (x: number, y: number)\n\nGets the world-space axis vector of the Prismatic Joint.",
+          signature = "[fun] () -> (x: number, y: number)"
+        },
         getJointSpeed = {
           description = "[fun] () -> (s: number)\n\nGet the current joint angle speed.",
           signature = "[fun] () -> (s: number)"
@@ -4721,10 +4849,6 @@ return {
         getUpperLimit = {
           description = "[fun] () -> (upper: number)\n\nGets the upper limit.",
           signature = "[fun] () -> (upper: number)"
-        },
-        hasLimitsEnabled = {
-          description = "[fun] () -> (enabled: boolean)\n\nChecks whether the limits are enabled.",
-          signature = "[fun] () -> (enabled: boolean)"
         },
         isMotorEnabled = {
           description = "[fun] () -> (enabled: boolean)\n\nChecks whether the motor is enabled.",
@@ -4826,10 +4950,6 @@ return {
           description = "[fun] () -> (upper: number)\n\nGets the upper limit.",
           signature = "[fun] () -> (upper: number)"
         },
-        hasLimitsEnabled = {
-          description = "[fun] () -> (enabled: boolean)\n\nChecks whether limits are enabled.",
-          signature = "[fun] () -> (enabled: boolean)"
-        },
         isMotorEnabled = {
           description = "[fun] () -> (enabled: boolean)\n\nChecks whether the motor is enabled.",
           signature = "[fun] () -> (enabled: boolean)"
@@ -4837,6 +4957,10 @@ return {
         setLimits = {
           description = "[fun] (lower: number, upper: number) -> ()\n\nSets the limits.",
           signature = "[fun] (lower: number, upper: number) -> ()"
+        },
+        setLimitsEnabled = {
+          description = "[fun] (enable: boolean) -> ()\n\nEnables or disables the joint limits.",
+          signature = "[fun] (enable: boolean) -> ()"
         },
         setLowerLimit = {
           description = "[fun] (lower: number) -> ()\n\nSets the lower limit.",
@@ -4860,9 +4984,9 @@ return {
         }
       },
       RopeJoint = {
-        getMaxLength = {
-          description = "[fun] () -> (maxLength: number)\n\nGets the maximum length of a RopeJoint.",
-          signature = "[fun] () -> (maxLength: number)"
+        setMaxLength = {
+          description = "[fun] (maxLength: number) -> ()\n\nSets the maximum length of a RopeJoint.",
+          signature = "[fun] (maxLength: number) -> ()"
         }
       },
       Shape = {
@@ -5051,8 +5175,8 @@ return {
           signature = "[fun] (x: number, y: number) -> ()"
         },
         update = {
-          description = "[fun] (dt: number) -> ()\n\nUpdate the state of the world.",
-          signature = "[fun] (dt: number) -> ()"
+          description = "[fun] (dt: number, velocityiterations: number, positioniterations: number) -> ()\n\nUpdate the state of the world.",
+          signature = "[fun] (dt: number, velocityiterations: number, positioniterations: number) -> ()"
         }
       },
       getMeter = {
@@ -5152,9 +5276,13 @@ return {
       description = "[fun] () -> ()\n\nThe main function, containing the main loop.\nA sensible default is used when left out.",
       signature = "[fun] () -> ()"
     },
+    setDeprecationOutput = {
+      description = "[fun] (enable: boolean) -> ()\n\nSets whether LÖVE displays warnings when using deprecated functionality.\nIt is disabled by default in fused mode, and enabled by default otherwise.\n\nWhen deprecation output is enabled, the first use of a formally deprecated LÖVE API will show a message at the bottom of the screen for a short time, and print the message to the console.",
+      signature = "[fun] (enable: boolean) -> ()"
+    },
     sound = {
       Decoder = {
-        getChannels = {
+        getChannelCount = {
           description = "[fun] () -> (channels: number)\n\nReturns the number of channels in the stream.",
           signature = "[fun] () -> (channels: number)"
         },
@@ -5168,7 +5296,7 @@ return {
         }
       },
       SoundData = {
-        getChannels = {
+        getChannelCount = {
           description = "[fun] () -> (channels: number)\n\nReturns the number of channels in the stream.",
           signature = "[fun] () -> (channels: number)"
         },
@@ -5257,12 +5385,16 @@ return {
     thread = {
       Channel = {
         demand = {
-          description = "[fun] () -> (value: Variant)\n\nRetrieves the value of a Channel message and removes it from the message queue.\n\nIt waits until a message is in the queue then returns the message value.",
-          signature = "[fun] () -> (value: Variant)"
+          description = "[fun] (timeout: number) -> (value: Variant)\n\nRetrieves the value of a Channel message and removes it from the message queue.\n\nIt waits until a message is in the queue then returns the message value.",
+          signature = "[fun] (timeout: number) -> (value: Variant)"
         },
         getCount = {
           description = "[fun] () -> (count: number)\n\nRetrieves the number of messages in the thread Channel queue.",
           signature = "[fun] () -> (count: number)"
+        },
+        hasRead = {
+          description = "[fun] (id: number) -> (hasread: boolean)\n\nGets whether a pushed value has been popped or otherwise removed from the Channel.",
+          signature = "[fun] (id: number) -> (hasread: boolean)"
         },
         peek = {
           description = "[fun] () -> (value: Variant)\n\nRetrieves the value of a Channel message, but leaves it in the queue.\n\nIt returns nil if there's no message in the queue.",
@@ -5281,8 +5413,8 @@ return {
           signature = "[fun] (value: Variant) -> ()"
         },
         supply = {
-          description = "[fun] (value: Variant) -> ()\n\nSend a message to the thread Channel and wait for a thread to accept it.\n\nSee Variant for the list of supported types.",
-          signature = "[fun] (value: Variant) -> ()"
+          description = "[fun] (value: Variant) -> (success: boolean)\n\nSend a message to the thread Channel and wait for a thread to accept it.\n\nSee Variant for the list of supported types.",
+          signature = "[fun] (value: Variant) -> (success: boolean)"
         }
       },
       Thread = {
@@ -5330,8 +5462,8 @@ return {
         signature = "[fun] (s: number) -> ()"
       },
       step = {
-        description = "[fun] () -> ()\n\nMeasures the time between two frames.\nCalling this changes the return value of love.timer.getDelta.",
-        signature = "[fun] () -> ()"
+        description = "[fun] () -> (dt: number)\n\nMeasures the time between two frames.\nCalling this changes the return value of love.timer.getDelta.",
+        signature = "[fun] () -> (dt: number)"
       }
     },
     touch = {
@@ -5407,6 +5539,10 @@ return {
         description = "[fun] (pixelvalue: number) -> (value: number)\n\nConverts a number from pixels to density-independent units.\n\nThe pixel density inside the window might be greater (or smaller) than the \"size\" of the window.\nFor example on a retina screen in Mac OS X with the highdpi window flag enabled, the window may take up the same physical size as an 800x600 window, but the area inside the window uses 1600x1200 pixels.\nlove.window.fromPixels(1600) would return 800 in that case.\n\nThis function converts coordinates from pixels to the size users are expecting them to display at onscreen.\nlove.window.toPixels does the opposite.\nThe highdpi window flag must be enabled to use the full pixel density of a Retina screen on Mac OS X and iOS.\nThe flag currently does nothing on Windows and Linux, and on Android it is effectively always enabled.\n\nMost LÖVE functions return values and expect arguments in terms of pixels rather than density-independent units.",
         signature = "[fun] (pixelvalue: number) -> (value: number)"
       },
+      getDPIScale = {
+        description = "[fun] () -> (scale: number)\n\nGets the DPI scale factor associated with the window.\n\nThe pixel density inside the window might be greater (or smaller) than the \"size\" of the window.\nFor example on a retina screen in Mac OS X with the highdpi window flag enabled, the window may take up the same physical size as an 800x600 window, but the area inside the window uses 1600x1200 pixels.\nlove.window.getDPIScale() would return 2.0 in that case.\n\nThe love.window.fromPixels and love.window.toPixels functions can also be used to convert between units.\n\nThe highdpi window flag must be enabled to use the full pixel density of a Retina screen on Mac OS X and iOS.\nThe flag currently does nothing on Windows and Linux, and on Android it is effectively always enabled.",
+        signature = "[fun] () -> (scale: number)"
+      },
       getDisplayName = {
         description = "[fun] (displayindex: number) -> (name: string)\n\nGets the name of a display.",
         signature = "[fun] (displayindex: number) -> (name: string)"
@@ -5455,6 +5591,10 @@ return {
         description = "[fun] () -> (maximized: boolean)\n\nGets whether the Window is currently maximized.\n\nThe window can be maximized if it is not fullscreen and is resizable, and either the user has pressed the window's Maximize button or love.window.maximize has been called.",
         signature = "[fun] () -> (maximized: boolean)"
       },
+      isMinimized = {
+        description = "[fun] () -> (maximized: boolean)\n\nGets whether the Window is currently minimized.",
+        signature = "[fun] () -> (maximized: boolean)"
+      },
       isOpen = {
         description = "[fun] () -> (open: boolean)\n\nChecks if the window is open.",
         signature = "[fun] () -> (open: boolean)"
@@ -5474,6 +5614,10 @@ return {
       requestAttention = {
         description = "[fun] (continuous: boolean) -> ()\n\nCauses the window to request the attention of the user if it is not in the foreground.\n\nIn Windows the taskbar icon will flash, and in OS X the dock icon will bounce.",
         signature = "[fun] (continuous: boolean) -> ()"
+      },
+      restore = {
+        description = "[var]\n\nRestores the size and position of the window if it was minimized or maximized.",
+        signature = "[var]"
       },
       setDisplaySleepEnabled = {
         description = "[fun] (enable: boolean) -> ()\n\nSets whether the display is allowed to sleep while the program is running.\n\nDisplay sleep is disabled by default.\nSome types of input (e.g.\njoystick button presses) might not prevent the display from sleeping, if display sleep is allowed.",
@@ -5506,6 +5650,10 @@ return {
       toPixels = {
         description = "[fun] (value: number) -> (pixelvalue: number)\n\nConverts a number from density-independent units to pixels.\n\nThe pixel density inside the window might be greater (or smaller) than the \"size\" of the window.\nFor example on a retina screen in Mac OS X with the highdpi window flag enabled, the window may take up the same physical size as an 800x600 window, but the area inside the window uses 1600x1200 pixels.\nlove.window.toPixels(800) would return 1600 in that case.\n\nThis is used to convert coordinates from the size users are expecting them to display at onscreen to pixels.\nlove.window.fromPixels does the opposite.\nThe highdpi window flag must be enabled to use the full pixel density of a Retina screen on Mac OS X and iOS.\nThe flag currently does nothing on Windows and Linux, and on Android it is effectively always enabled.\n\nMost LÖVE functions return values and expect arguments in terms of pixels rather than density-independent units.",
         signature = "[fun] (value: number) -> (pixelvalue: number)"
+      },
+      updateMode = {
+        description = "[fun] (width: number, height: number, settings: table) -> (success: boolean)\n\nSets the display mode and properties of the window, without modifying unspecified properties.\n\nIf width or height is 0, updateMode will use the width and height of the desktop.\n\nChanging the display mode may have side effects: for example, canvases will be cleared.\nMake sure to save the contents of canvases beforehand or re-draw to them afterward if you need to.",
+        signature = "[fun] (width: number, height: number, settings: table) -> (success: boolean)"
       }
     }
   }
