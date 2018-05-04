@@ -1,7 +1,9 @@
 <p align="center"><img src="https://love2d.org/style/logo.png" width="128"></p>
 <h4 align="center">LÖVE bundle for Howl</h4>
 
-![love2D shield](https://img.shields.io/badge/L%C3%96VE-v0.10.2-B1E3FA.svg) ![howl shield](https://img.shields.io/badge/Howl-master-4E63B5.svg)
+#### Notes
+- I'm using the master branch of **Howl**
+- The currently supported LÖVE API version should be **11.1**
 
 #### Features
 1. API Completion
@@ -14,3 +16,10 @@
 
 #### API Source
 The API is generated from [love2d-community/love-api](https://github.com/love2d-community/love-api) and appended to the Lua API.
+
+#### Converting the API by yourself
+1. Clone the https://github.com/love2d-community/love-api repo somewhere (do not rename)
+2. Copy the generate.lua script outside that directory
+3. `cd` into that directory
+4. Run it like `lua generate.lua`
+5. The converted API will be in `api.lua`
